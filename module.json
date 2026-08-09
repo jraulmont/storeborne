@@ -1,0 +1,13 @@
+{
+  "id": "storeborne",
+  "title": "StoreBorne",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "flags": {
+    "canUpload": true
+  },
+  "description": ""
+}
