@@ -120,13 +120,15 @@ export class ShopView extends HandlebarsApplicationMixin(ApplicationV2) {
 
         ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor }),
+            title: shop.name,
             content: game.i18n.format('SHOPMARKET.Chat.Bought', {
                 actor: actor.name,
                 quantity,
                 item: result.entry.name,
                 shop: shop.name,
                 price: formatPrice(totalCost)
-            })
+            }),
+            rolls: []
         });
 
         this.render();

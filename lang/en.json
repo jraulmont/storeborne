@@ -12,6 +12,7 @@
     "SHOPMARKET.Config.NoShops": "No shops yet. Click \"New Shop\" to create one.",
     "SHOPMARKET.Config.DeleteTitle": "Delete Shop",
     "SHOPMARKET.Config.DeleteConfirm": "Delete \"{name}\"? This cannot be undone.",
+    "SHOPMARKET.Config.OpenCatalog": "Price Catalog",
 
     "SHOPMARKET.Editor.Title": "Edit Shop",
     "SHOPMARKET.Editor.PickImage": "Click to change image",
@@ -70,13 +71,21 @@
     "SHOPMARKET.Notif.BuyFailed": "Purchase failed: {reason}",
     "SHOPMARKET.Notif.SellFailed": "Sale failed: {reason}",
 
-    "SHOPMARKET.Chat.Bought": "<p><strong>{actor}</strong> bought {quantity}x <strong>{item}</strong> from {shop} for {price}.</p>",
-    "SHOPMARKET.Chat.Sold": "<p><strong>{actor}</strong> sold {quantity}x <strong>{item}</strong> to {shop} for {price}.</p>",
+    "SHOPMARKET.Chat.Bought": "<p>Bought {quantity}x <strong>{item}</strong> from <strong>{shop}</strong> for {price}.</p>",
+    "SHOPMARKET.Chat.Sold": "<p>Sold {quantity}x <strong>{item}</strong> to <strong>{shop}</strong> for {price}.</p>",
 
     "SHOPMARKET.Settings.CoinsPerHandful.Name": "Coins per Handful",
     "SHOPMARKET.Settings.CoinsPerHandful.Hint": "The Daggerheart gold track (Coins/Handfuls/Bags/Chests) has no fixed exchange rate between Coins and Handfuls in the core rules. This module needs one to do math for you — set how many Coins equal 1 Handful.",
     "SHOPMARKET.Settings.ReturnSoldItems.Name": "Sold Items Restock the Shop",
     "SHOPMARKET.Settings.ReturnSoldItems.Hint": "When a player sells an item to a shop, add it back to that shop's stock (unless the shop entry is set to Unlimited).",
     "SHOPMARKET.Settings.SellEnabled.Name": "Allow Selling",
-    "SHOPMARKET.Settings.SellEnabled.Hint": "Globally allow players to sell items back to shops."
+    "SHOPMARKET.Settings.SellEnabled.Hint": "Globally allow players to sell items back to shops.",
+
+    "SHOPMARKET.Catalog.Title": "Price Catalog",
+    "SHOPMARKET.Catalog.Save": "Save Catalog",
+    "SHOPMARKET.Catalog.StackKey": "Stack Key",
+    "SHOPMARKET.Catalog.Price": "Price (Luna)",
+    "SHOPMARKET.Catalog.Delete": "Delete Entry",
+    "SHOPMARKET.Catalog.Empty": "No catalog entries yet.",
+    "SHOPMARKET.Catalog.Open": "Open Price Catalog"
 }

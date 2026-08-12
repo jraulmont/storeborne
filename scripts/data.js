@@ -3,13 +3,12 @@ export const SOCKET = `module.${MODULE_ID}`;
 
 export const SETTINGS = {
     shops: 'shops',
-    coinsPerHandful: 'coinsPerHandful',
     returnSoldItems: 'returnSoldItems',
     sellEnabled: 'sellEnabled'
 };
 
 /** Item types this module treats as sellable/stockable inventory in the Daggerheart system. */
-export const INVENTORY_ITEM_TYPES = ['weapon', 'armor', 'consumable', 'loot'];
+export const INVENTORY_ITEM_TYPES = ['loot'];
 
 export function registerSettings() {
     game.settings.register(MODULE_ID, SETTINGS.shops, {
@@ -17,15 +16,6 @@ export function registerSettings() {
         config: false,
         type: Array,
         default: []
-    });
-
-    game.settings.register(MODULE_ID, SETTINGS.coinsPerHandful, {
-        name: 'SHOPMARKET.Settings.CoinsPerHandful.Name',
-        hint: 'SHOPMARKET.Settings.CoinsPerHandful.Hint',
-        scope: 'world',
-        config: true,
-        type: Number,
-        default: 10
     });
 
     game.settings.register(MODULE_ID, SETTINGS.returnSoldItems, {
@@ -94,65 +84,18 @@ export function makeEmptyShop() {
     };
 }
 
-/* -------------------------------------------- */
-/*  Currency math                                */
-/*                                                */
-/*  The Daggerheart system stores gold as an      */
-/*  abstract four-tier structure on the actor:    */
-/*  system.gold = { coins, handfuls, bags, chests }*/
-/*  with a fixed 10:1 carry between handfuls/bags  */
-/*  and bags/chests. There is no built-in exchange */
-/*  rate between "coins" and "handfuls" (coins is  */
-/*  an optional homebrew subdivision), so this      */
-/*  module uses a configurable world setting        */
-/*  (coinsPerHandful, default 10) to convert.        */
-/*  Item prices are set by the GM as a single        */
-/*  number of Handfuls (decimals allowed), which     */
-/*  keeps pricing simple while still round-tripping  */
-/*  losslessly through the actor's real currency     */
-/*  fields.                                          */
-/* -------------------------------------------- */
-
-export function coinsPerHandful() {
-    return Math.max(1, Number(game.settings.get(MODULE_ID, SETTINGS.coinsPerHandful)) || 10);
-}
-
 /** Convert an actor's gold object into a single normalized "handfuls" value. */
 export function goldToHandfuls(gold) {
-    const cph = coinsPerHandful();
-    const coins = gold?.coins ?? 0;
-    const handfuls = gold?.handfuls ?? 0;
-    const bags = gold?.bags ?? 0;
-    const chests = gold?.chests ?? 0;
-    return coins / cph + handfuls + bags * 10 + chests * 100;
+    return gold?.handfuls ?? 0;
 }
 
-/** Convert a normalized "handfuls" value back into the four-tier gold structure. */
+/** Convert a normalized "handfuls" value back into the gold structure (handfuls only). */
 export function handfulsToGold(totalHandfuls) {
-    const cph = coinsPerHandful();
-    let totalCoins = Math.max(0, Math.round(totalHandfuls * cph));
-
-    const chests = Math.floor(totalCoins / (100 * cph));
-    totalCoins -= chests * 100 * cph;
-
-    const bags = Math.floor(totalCoins / (10 * cph));
-    totalCoins -= bags * 10 * cph;
-
-    const handfuls = Math.floor(totalCoins / cph);
-    totalCoins -= handfuls * cph;
-
-    const coins = totalCoins;
-
-    return { coins, handfuls, bags, chests };
+    return { handfuls: Math.max(0, Math.floor(totalHandfuls)) };
 }
 
 export function formatGold(gold) {
-    const parts = [];
-    if (gold.chests) parts.push(`${gold.chests} c`);
-    if (gold.bags) parts.push(`${gold.bags} b`);
-    if (gold.handfuls) parts.push(`${gold.handfuls} Lu`);
-    if (gold.coins) parts.push(`${gold.coins} co`);
-    return parts.length ? parts.join(' ') : '0 Lu';
+    return `${gold.handfuls ?? 0} Lu`;
 }
 
 export function formatPrice(priceInHandfuls) {
@@ -180,10 +123,16 @@ export async function setActorTotalHandfuls(actor, totalHandfuls) {
 /**
  * Add a snapshot item to an actor's inventory, stacking onto an existing
  * item (matched by the shop catalog entry's stable key) if present.
+ * This now stacks against any item whose resolved stackKey matches,
+ * even if it came from another source (loot, compendium, etc.).
  */
 export async function addItemToActor(actor, catalogEntry, quantity = 1) {
     const key = catalogEntry.stackKey;
-    const existing = actor.items.find(i => i.getFlag(MODULE_ID, 'stackKey') === key);
+    // console.log(catalogEntry)
+
+    // Use resolved stack key so non-shop items with same source also stack
+    // const existing = actor.items.find(i => getItemStackKey(i) === key);
+    const existing = actor.items.find(i => i.name === catalogEntry.name && i.type === catalogEntry.type)
 
     if (existing) {
         const newQty = (existing.system.quantity ?? 1) + quantity;
@@ -260,11 +209,12 @@ export async function drawShopItems(shop) {
 /**
  * Regenerate a shop's inventory from its configured roll tables. Existing catalog
  * entries (and their GM-set prices) are preserved and topped up; brand-new items
- * are added with a default price of 1 Handful for the GM to adjust.
+ * are added with a price from the global catalog if present, otherwise 1 Handful.
  */
 export async function generateShopInventory(shop) {
     const drawnItems = await drawShopItems(shop);
     const inventory = foundry.utils.deepClone(shop.inventory ?? []);
+    const catalog = getCatalog();
 
     for (const sourceItem of drawnItems) {
         const stackKey = buildStackKey(sourceItem);
@@ -272,6 +222,8 @@ export async function generateShopInventory(shop) {
         if (existing) {
             if (shop.allowDuplicates !== false && !existing.unlimited) existing.quantity += 1;
         } else {
+            const predefinedPrice = catalog[stackKey] ?? 1;
+
             inventory.push({
                 id: foundry.utils.randomID(),
                 stackKey,
@@ -280,7 +232,7 @@ export async function generateShopInventory(shop) {
                 type: sourceItem.type,
                 quantity: 1,
                 unlimited: false,
-                price: 1,
+                price: predefinedPrice,
                 itemData: sourceItem.toObject()
             });
         }

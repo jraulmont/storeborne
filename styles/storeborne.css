@@ -44,7 +44,7 @@
     border-radius: 4px;
 }
 
-.shop-row.shop-market-hidden {
+.shop-row.storeborne-hidden {
     opacity: 0.5;
 }
 
@@ -239,7 +239,7 @@
     background: rgba(0, 0, 0, 0.05);
 }
 
-.shop-card.shop-market-hidden {
+.shop-card.storeborne-hidden {
     opacity: 0.5;
 }
 

@@ -7,9 +7,13 @@ export function initSocket() {
 }
 
 function isAuthoritativeGM() {
-    // Only the single "active GM" (Foundry v11+) answers requests, so two
-    // GM clients online at once don't double-process a transaction.
-    return game.user.isGM && game.user.id === game.users.activeGM?.id;
+    // Prefer the single "active GM" so two GM clients online at once don't
+    // double-process a transaction. If that can't be determined for some
+    // reason, fall back to letting any connected GM handle it rather than
+    // leaving every request to time out with no one responding.
+    if (!game.user.isGM) return false;
+    const active = game.users.activeGM;
+    return active ? game.user.id === active.id : true;
 }
 
 async function handleMessage(msg) {
@@ -23,10 +27,22 @@ async function handleMessage(msg) {
     if (!isAuthoritativeGM()) return;
 
     if (msg.type === 'requestBuy') {
-        const result = await performBuy(msg.payload);
+        let result;
+        try {
+            result = await performBuy(msg.payload);
+        } catch (err) {
+            console.error('storeborne | Buy request failed', err);
+            result = { ok: false, error: 'internal-error' };
+        }
         emitResponse(msg.requestId, msg.senderId, result);
     } else if (msg.type === 'requestSell') {
-        const result = await performSell(msg.payload);
+        let result;
+        try {
+            result = await performSell(msg.payload);
+        } catch (err) {
+            console.error('storeborne | Sell request failed', err);
+            result = { ok: false, error: 'internal-error' };
+        }
         emitResponse(msg.requestId, msg.senderId, result);
     }
 }
