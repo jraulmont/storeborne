@@ -1,0 +1,15 @@
+<div class="storeborne shop-browser">
+    {{#if shops.length}}
+    <ul class="shop-cards">
+        {{#each shops as |shop|}}
+        <li class="shop-card {{#unless shop.enabled}}shop-market-hidden{{/unless}}" data-shop-id="{{shop.id}}" data-action="openShop">
+            <img src="{{shop.img}}" alt="{{shop.name}}" />
+            <div class="shop-card-name">{{shop.name}}</div>
+            {{#unless shop.enabled}}<div class="shop-card-badge">{{localize "SHOPMARKET.Browser.Hidden"}}</div>{{/unless}}
+        </li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <p class="hint">{{localize "SHOPMARKET.Browser.NoShops"}}</p>
+    {{/if}}
+</div>

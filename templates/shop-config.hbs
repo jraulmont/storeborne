@@ -1,0 +1,36 @@
+<div class="storeborne shop-config">
+    <div class="toolbar">
+        <button type="button" data-action="createShop"><i class="fa-solid fa-plus"></i> {{localize "SHOPMARKET.Config.NewShop"}}</button>
+        <button type="button" data-action="openSettings"><i class="fa-solid fa-gear"></i> {{localize "SHOPMARKET.Config.Settings"}}</button>
+    </div>
+
+    {{#if shops.length}}
+    <ul class="shop-list">
+        {{#each shops as |shop|}}
+        <li class="shop-row {{#unless shop.enabled}}shop-market-hidden{{/unless}}" data-shop-id="{{shop.id}}">
+            <img src="{{shop.img}}" alt="{{shop.name}}" />
+            <div class="shop-info">
+                <div class="shop-name">{{shop.name}}</div>
+                <div class="shop-meta">{{shop.inventory.length}} {{localize "SHOPMARKET.Config.Items"}}</div>
+            </div>
+            <div class="shop-actions">
+                <button type="button" data-action="toggleShop" title="{{localize 'SHOPMARKET.Config.ToggleEnabled'}}">
+                    <i class="fa-solid {{#if shop.enabled}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
+                </button>
+                <button type="button" data-action="previewShop" title="{{localize 'SHOPMARKET.Config.Preview'}}">
+                    <i class="fa-solid fa-store"></i>
+                </button>
+                <button type="button" data-action="editShop" title="{{localize 'SHOPMARKET.Config.Edit'}}">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <button type="button" data-action="deleteShop" title="{{localize 'SHOPMARKET.Config.Delete'}}">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </li>
+        {{/each}}
+    </ul>
+    {{else}}
+    <p class="hint">{{localize "SHOPMARKET.Config.NoShops"}}</p>
+    {{/if}}
+</div>

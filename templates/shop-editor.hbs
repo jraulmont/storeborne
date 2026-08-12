@@ -1,0 +1,82 @@
+<div class="storeborne shop-editor">
+    <header class="editor-header">
+        <img class="shop-img" src="{{shop.img}}" data-action="pickImage" title="{{localize 'SHOPMARKET.Editor.PickImage'}}" />
+        <div class="header-fields">
+            <input type="text" name="name" value="{{shop.name}}" placeholder="{{localize 'SHOPMARKET.Editor.NamePlaceholder'}}" />
+            <input type="hidden" name="img" value="{{shop.img}}" />
+            <label class="checkbox-inline">
+                <input type="checkbox" name="enabled" {{#if shop.enabled}}checked{{/if}} />
+                {{localize "SHOPMARKET.Editor.Enabled"}}
+            </label>
+        </div>
+    </header>
+
+    <textarea name="description" rows="2" placeholder="{{localize 'SHOPMARKET.Editor.DescriptionPlaceholder'}}">{{shop.description}}</textarea>
+
+    <fieldset>
+        <legend>{{localize "SHOPMARKET.Editor.RollTables"}}</legend>
+        <p class="hint">{{localize "SHOPMARKET.Editor.RollTablesHint"}}</p>
+        <div class="table-dropzone dropzone">
+            {{#if tables.length}}
+            <ul class="pill-list">
+                {{#each tables as |table|}}
+                <li class="pill" data-uuid="{{table.uuid}}">
+                    <span>{{table.name}}</span>
+                    <a data-action="removeTable"><i class="fa-solid fa-xmark"></i></a>
+                </li>
+                {{/each}}
+            </ul>
+            {{else}}
+            <p class="dropzone-empty">{{localize "SHOPMARKET.Editor.DropTablesHere"}}</p>
+            {{/if}}
+        </div>
+        <div class="roll-count-row">
+            <label>{{localize "SHOPMARKET.Editor.RollCount"}}
+                <input type="number" name="rollCount" value="{{shop.rollCount}}" min="1" style="width:4em" />
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="allowDuplicates" {{#if shop.allowDuplicates}}checked{{/if}} />
+                {{localize "SHOPMARKET.Editor.AllowDuplicates"}}
+            </label>
+            <button type="button" data-action="generate"><i class="fa-solid fa-dice"></i> {{localize "SHOPMARKET.Editor.Generate"}}</button>
+        </div>
+    </fieldset>
+
+    <fieldset class="inventory-fieldset">
+        <legend>{{localize "SHOPMARKET.Editor.Inventory"}}</legend>
+        <p class="hint">{{localize "SHOPMARKET.Editor.InventoryHint"}}</p>
+        <div class="inventory-dropzone dropzone">
+            <p class="dropzone-empty">{{localize "SHOPMARKET.Editor.DropItemsHere"}}</p>
+        </div>
+
+        {{#if inventory.length}}
+        <table class="inventory-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{{localize "SHOPMARKET.Editor.ColName"}}</th>
+                    <th>{{localize "SHOPMARKET.Editor.ColQty"}}</th>
+                    <th>{{localize "SHOPMARKET.Editor.ColUnlimited"}}</th>
+                    <th>{{localize "SHOPMARKET.Editor.ColPrice"}}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each inventory as |entry|}}
+                <tr data-entry-id="{{entry.id}}">
+                    <td><img src="{{entry.img}}" class="entry-img" /></td>
+                    <td>{{entry.name}}</td>
+                    <td><input type="number" min="0" class="qty-field" data-entry-field="quantity" value="{{entry.quantity}}" {{#if entry.unlimited}}disabled{{/if}} /></td>
+                    <td><input type="checkbox" data-entry-field="unlimited" {{#if entry.unlimited}}checked{{/if}} /></td>
+                    <td><input type="number" min="0" step="0.5" class="price-field" data-entry-field="price" value="{{entry.price}}" /> <span class="price-label">({{entry.priceLabel}})</span></td>
+                    <td><a data-action="removeEntry" title="{{localize 'SHOPMARKET.Editor.RemoveEntry'}}"><i class="fa-solid fa-trash"></i></a></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <button type="button" data-action="clearInventory"><i class="fa-solid fa-broom"></i> {{localize "SHOPMARKET.Editor.ClearInventory"}}</button>
+        {{else}}
+        <p class="hint">{{localize "SHOPMARKET.Editor.NoInventory"}}</p>
+        {{/if}}
+    </fieldset>
+</div>

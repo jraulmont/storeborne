@@ -1,0 +1,267 @@
+.storeborne {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    padding: 0.5em;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.storeborne .hint {
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.storeborne .toolbar {
+    display: flex;
+    gap: 0.5em;
+}
+
+.storeborne img.entry-img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+/* ---- Shop list (GM config) ---- */
+.shop-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25em;
+}
+
+.shop-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.35em;
+    border: 1px solid var(--color-border-light-tertiary, #999);
+    border-radius: 4px;
+}
+
+.shop-row.shop-market-hidden {
+    opacity: 0.5;
+}
+
+.shop-row img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.shop-info {
+    flex: 1;
+}
+
+.shop-name {
+    font-weight: bold;
+}
+
+.shop-meta {
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+.shop-actions {
+    display: flex;
+    gap: 0.25em;
+}
+
+/* ---- Editor ---- */
+.editor-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+}
+
+.editor-header .shop-img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.header-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+}
+
+.checkbox-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    width: fit-content;
+}
+
+.dropzone {
+    border: 2px dashed var(--color-border-light-tertiary, #999);
+    border-radius: 6px;
+    padding: 0.5em;
+    min-height: 2.5em;
+}
+
+.dropzone-empty {
+    margin: 0;
+    text-align: center;
+    opacity: 0.6;
+    font-size: 0.9em;
+}
+
+.pill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 0.15em 0.6em;
+}
+
+.pill a {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.pill a:hover {
+    opacity: 1;
+}
+
+.roll-count-row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    margin-top: 0.5em;
+}
+
+.inventory-table,
+.shop-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventory-table th,
+.inventory-table td,
+.shop-table th,
+.shop-table td {
+    padding: 0.3em;
+    border-bottom: 1px solid var(--color-border-light-tertiary, #ddd);
+    text-align: left;
+}
+
+.inventory-table input[type='number'] {
+    width: 4.5em;
+}
+
+.shop-table input.qty-input {
+    width: 3.5em;
+}
+
+.price-label {
+    opacity: 0.6;
+    font-size: 0.85em;
+}
+
+/* ---- Storefront ---- */
+.view-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75em;
+}
+
+.view-header img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.view-header h2 {
+    margin: 0;
+}
+
+.shop-description {
+    margin: 0;
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+.gold-display {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    font-weight: bold;
+}
+
+.shop-table tr.not-sellable {
+    opacity: 0.5;
+}
+
+/* ---- Browser ---- */
+.shop-cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.75em;
+}
+
+.shop-card {
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid var(--color-border-light-tertiary, #999);
+    border-radius: 6px;
+    padding: 0.5em;
+    position: relative;
+    transition: transform 0.1s ease;
+}
+
+.shop-card:hover {
+    transform: scale(1.03);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.shop-card.shop-market-hidden {
+    opacity: 0.5;
+}
+
+.shop-card img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.shop-card-name {
+    margin-top: 0.35em;
+    font-weight: bold;
+}
+
+.shop-card-badge {
+    position: absolute;
+    top: 0.25em;
+    right: 0.25em;
+    font-size: 0.7em;
+    background: #a00;
+    color: #fff;
+    padding: 0 0.4em;
+    border-radius: 8px;
+}

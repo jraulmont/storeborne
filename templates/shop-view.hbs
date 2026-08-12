@@ -1,0 +1,83 @@
+<div class="storeborne shop-view">
+    <header class="view-header">
+        <img src="{{shop.img}}" alt="{{shop.name}}" />
+        <div>
+            <h2>{{shop.name}}</h2>
+            {{#if shop.description}}<p class="shop-description">{{shop.description}}</p>{{/if}}
+        </div>
+        <div class="gold-display">
+            <i class="fa-solid fa-coins"></i>
+            <span>{{#if actor}}{{actor.name}} — {{goldLabel}}{{else}}{{localize "SHOPMARKET.View.NoActor"}}{{/if}}</span>
+        </div>
+    </header>
+
+    <section class="for-sale">
+        <h3>{{localize "SHOPMARKET.View.ForSale"}}</h3>
+        {{#if forSale.length}}
+        <table class="shop-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{{localize "SHOPMARKET.View.ColName"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColStock"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColPrice"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColQty"}}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each forSale as |entry|}}
+                <tr data-entry-id="{{entry.id}}">
+                    <td><img src="{{entry.img}}" class="entry-img" /></td>
+                    <td>{{entry.name}}</td>
+                    <td>{{#if entry.unlimited}}∞{{else}}{{entry.quantity}}{{/if}}</td>
+                    <td>{{entry.priceLabel}}</td>
+                    <td><input type="number" class="qty-input" min="1" {{#unless entry.unlimited}}max="{{entry.quantity}}"{{/unless}} value="1" /></td>
+                    <td>
+                        <button type="button" data-action="buy" {{#unless entry.affordable}}disabled{{/unless}}>
+                            {{localize "SHOPMARKET.View.Buy"}}
+                        </button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="hint">{{localize "SHOPMARKET.View.Empty"}}</p>
+        {{/if}}
+    </section>
+
+    {{#if sellEnabled}}
+    <section class="for-sell">
+        <h3>{{localize "SHOPMARKET.View.YourItems"}}</h3>
+        {{#if sellable.length}}
+        <table class="shop-table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>{{localize "SHOPMARKET.View.ColName"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColOwned"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColPrice"}}</th>
+                    <th>{{localize "SHOPMARKET.View.ColQty"}}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each sellable as |item|}}
+                <tr data-item-id="{{item.id}}" class="{{#unless item.sellable}}not-sellable{{/unless}}">
+                    <td><img src="{{item.img}}" class="entry-img" /></td>
+                    <td>{{item.name}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{#if item.sellable}}{{item.priceLabel}}{{else}}{{localize "SHOPMARKET.View.NotAccepted"}}{{/if}}</td>
+                    <td>{{#if item.sellable}}<input type="number" class="qty-input" min="1" max="{{item.quantity}}" value="1" />{{/if}}</td>
+                    <td>{{#if item.sellable}}<button type="button" data-action="sell">{{localize "SHOPMARKET.View.Sell"}}</button>{{/if}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{else}}
+        <p class="hint">{{localize "SHOPMARKET.View.NothingToSell"}}</p>
+        {{/if}}
+    </section>
+    {{/if}}
+</div>
