@@ -1,0 +1,32 @@
+<div class="storeborne shop-catalog">
+    <p class="hint">{{localize "SHOPMARKET.Catalog.Hint"}}</p>
+
+    <div class="catalog-dropzone dropzone">
+        <p class="dropzone-empty">{{localize "SHOPMARKET.Catalog.DropHere"}}</p>
+    </div>
+
+    {{#if entries.length}}
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>{{localize "SHOPMARKET.Editor.ColName"}}</th>
+                <th>{{localize "SHOPMARKET.Catalog.Price"}}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each entries as |entry|}}
+            <tr data-stack-key="{{entry.stackKey}}">
+                <td><img src="{{entry.img}}" class="entry-img" /></td>
+                <td>{{entry.name}}</td>
+                <td><input type="number" min="0" step="0.5" class="price-field" data-entry-field="price" value="{{entry.price}}" /> <span class="price-label">({{entry.priceLabel}})</span></td>
+                <td><a data-action="removeEntry" title="{{localize 'SHOPMARKET.Catalog.Delete'}}"><i class="fa-solid fa-trash"></i></a></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{else}}
+    <p class="hint">{{localize "SHOPMARKET.Catalog.Empty"}}</p>
+    {{/if}}
+</div>

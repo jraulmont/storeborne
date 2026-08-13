@@ -6,8 +6,8 @@
             {{#if shop.description}}<p class="shop-description">{{shop.description}}</p>{{/if}}
         </div>
         <div class="gold-display">
+            <span>{{#if actor}}{{actor.name}}: {{goldLabel}}{{else}}{{localize "SHOPMARKET.View.NoActor"}}{{/if}}</span>
             <i class="fa-solid fa-coins"></i>
-            <span>{{#if actor}}{{actor.name}} — {{goldLabel}}{{else}}{{localize "SHOPMARKET.View.NoActor"}}{{/if}}</span>
         </div>
     </header>
 

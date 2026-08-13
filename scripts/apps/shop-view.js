@@ -5,7 +5,8 @@ import {
     setActorTotalHandfuls,
     addItemToActor,
     removeQuantityFromActorItem,
-    getItemStackKey,
+    getCatalog,
+    findCatalogEntryForItem,
     formatGold,
     formatPrice,
     INVENTORY_ITEM_TYPES
@@ -24,7 +25,7 @@ export class ShopView extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
         id: 'storeborne-view',
         tag: 'div',
-        window: { title: 'SHOPMARKET.View.Title', icon: 'fa-solid fa-store', resizable: true },
+        window: { title: 'SHOPMARKET.View.Title', icon: 'fa-solid fa-coins', resizable: true },
         position: { width: 780, height: 720 },
         actions: {
             buy: ShopView.#onBuy,
@@ -58,13 +59,12 @@ export class ShopView extends HandlebarsApplicationMixin(ApplicationV2) {
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
 
-        const stackKeys = new Set((shop?.inventory ?? []).map(e => e.stackKey));
+        const catalog = getCatalog();
         const sellable = actor
             ? actor.items
                   .filter(i => INVENTORY_ITEM_TYPES.includes(i.type) && (i.system.quantity ?? 1) > 0)
                   .map(i => {
-                      const stackKey = getItemStackKey(i);
-                      const entry = shop?.inventory.find(e => e.stackKey === stackKey);
+                      const entry = findCatalogEntryForItem(i, catalog);
                       return {
                           id: i.id,
                           name: i.name,
@@ -146,10 +146,14 @@ export class ShopView extends HandlebarsApplicationMixin(ApplicationV2) {
 
         const maxQty = item.system.quantity ?? 1;
         const quantity = Math.min(maxQty, Math.max(1, parseInt(qtyInput?.value) || 1));
-        const stackKey = getItemStackKey(item);
 
         target.disabled = true;
-        const result = await requestSell({ shopId: this.shopId, stackKey, quantity });
+        const result = await requestSell({
+            shopId: this.shopId,
+            itemName: item.name,
+            itemType: item.type,
+            quantity
+        });
         target.disabled = false;
 
         if (!result.ok) {

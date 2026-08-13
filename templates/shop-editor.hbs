@@ -68,7 +68,10 @@
                     <td>{{entry.name}}</td>
                     <td><input type="number" min="0" class="qty-field" data-entry-field="quantity" value="{{entry.quantity}}" {{#if entry.unlimited}}disabled{{/if}} /></td>
                     <td><input type="checkbox" data-entry-field="unlimited" {{#if entry.unlimited}}checked{{/if}} /></td>
-                    <td><input type="number" min="0" step="0.5" class="price-field" data-entry-field="price" value="{{entry.price}}" /> <span class="price-label">({{entry.priceLabel}})</span></td>
+                    <td>
+                        <input type="number" min="0" step="0.5" class="price-field" data-entry-field="price" value="{{entry.price}}" /> <span class="price-label">({{entry.priceLabel}})</span>
+                        {{#unless entry.inCatalog}}<span class="not-in-catalog" title="{{localize 'SHOPMARKET.Editor.NotInCatalog'}}"><i class="fa-solid fa-triangle-exclamation"></i></span>{{/unless}}
+                    </td>
                     <td><a data-action="removeEntry" title="{{localize 'SHOPMARKET.Editor.RemoveEntry'}}"><i class="fa-solid fa-trash"></i></a></td>
                 </tr>
                 {{/each}}

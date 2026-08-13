@@ -1,6 +1,7 @@
 import { MODULE_ID, getShops, upsertShop, deleteShop, makeEmptyShop } from '../data.js';
 import { ShopEditor } from './shop-editor.js';
 import { ShopView } from './shop-view.js';
+import { ShopCatalog } from './shop-catalog.js';
 import { resolvePlayerActor, promptForActor } from '../util.js';
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -9,7 +10,7 @@ export class ShopConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
         id: 'storeborne-config',
         tag: 'div',
-        window: { title: 'SHOPMARKET.Config.Title', icon: 'fa-solid fa-store', resizable: true },
+        window: { title: 'SHOPMARKET.Config.Title', icon: 'fa-solid fa-coins', resizable: true },
         position: { width: 560, height: 640 },
         actions: {
             createShop: ShopConfig.#onCreateShop,
@@ -17,7 +18,8 @@ export class ShopConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             previewShop: ShopConfig.#onPreviewShop,
             toggleShop: ShopConfig.#onToggleShop,
             deleteShop: ShopConfig.#onDeleteShop,
-            openSettings: ShopConfig.#onOpenSettings
+            openSettings: ShopConfig.#onOpenSettings,
+            openCatalog: ShopConfig.#onOpenCatalog
         }
     };
 
@@ -71,5 +73,9 @@ export class ShopConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     static #onOpenSettings() {
         game.settings.sheet.render(true);
+    }
+
+    static #onOpenCatalog() {
+        new ShopCatalog().render(true);
     }
 }

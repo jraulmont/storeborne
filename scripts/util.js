@@ -1,4 +1,3 @@
-/** Try to silently determine which character the current user should be shopping as. */
 export function resolvePlayerActor() {
     if (game.user.character) return game.user.character;
     const owned = game.actors.filter(a => a.isOwner && a.type === 'character');
@@ -6,7 +5,6 @@ export function resolvePlayerActor() {
     return null;
 }
 
-/** Ask the user to pick one of their owned characters (used when resolvePlayerActor is ambiguous). */
 export async function promptForActor() {
     const owned = game.actors.filter(a => a.isOwner && (a.type === 'character' || a.type === 'party'));
     if (!owned.length) {

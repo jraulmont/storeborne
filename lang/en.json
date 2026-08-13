@@ -33,6 +33,7 @@
     "SHOPMARKET.Editor.ColUnlimited": "Unlimited",
     "SHOPMARKET.Editor.ColPrice": "Price (Luna)",
     "SHOPMARKET.Editor.RemoveEntry": "Remove from shop",
+    "SHOPMARKET.Editor.NotInCatalog": "This item isn't in the global price catalog, so players won't be able to sell it back.",
     "SHOPMARKET.Editor.ClearInventory": "Clear All Inventory",
     "SHOPMARKET.Editor.ClearInventoryTitle": "Clear Inventory",
     "SHOPMARKET.Editor.ClearInventoryConfirm": "Remove every item and price from this shop? This cannot be undone.",
@@ -64,12 +65,15 @@
     "SHOPMARKET.Notif.NoGM": "No GM is currently online — a GM must be connected to complete shop transactions.",
     "SHOPMARKET.Notif.NoActor": "You don't have a character assigned. Set one as your default Character in your user config, or own exactly one character.",
     "SHOPMARKET.Notif.DropRollTableOnly": "Only Roll Tables can be dropped here.",
-    "SHOPMARKET.Notif.DropItemOnly": "Only Items can be dropped here.",
+    "SHOPMARKET.Notif.DropItemOnly": "Only Items (or a Folder/Compendium of Items) can be dropped here.",
     "SHOPMARKET.Notif.NoTablesConfigured": "Add at least one Roll Table before generating inventory.",
     "SHOPMARKET.Notif.InventoryGenerated": "Shop inventory generated.",
     "SHOPMARKET.Notif.CantAfford": "You can't afford that.",
     "SHOPMARKET.Notif.BuyFailed": "Purchase failed: {reason}",
     "SHOPMARKET.Notif.SellFailed": "Sale failed: {reason}",
+    "SHOPMARKET.Notif.CatalogItemAdded": "Added \"{name}\" to the price catalog.",
+    "SHOPMARKET.Notif.CatalogBulkAdded": "Added {count} item(s) to the price catalog.",
+    "SHOPMARKET.Notif.NoItemsInFolder": "That folder doesn't contain any Items.",
 
     "SHOPMARKET.Chat.Bought": "<p>Bought {quantity}x <strong>{item}</strong> from <strong>{shop}</strong> for {price}.</p>",
     "SHOPMARKET.Chat.Sold": "<p>Sold {quantity}x <strong>{item}</strong> to <strong>{shop}</strong> for {price}.</p>",
@@ -82,10 +86,9 @@
     "SHOPMARKET.Settings.SellEnabled.Hint": "Globally allow players to sell items back to shops.",
 
     "SHOPMARKET.Catalog.Title": "Price Catalog",
-    "SHOPMARKET.Catalog.Save": "Save Catalog",
-    "SHOPMARKET.Catalog.StackKey": "Stack Key",
+    "SHOPMARKET.Catalog.Hint": "The global catalog defines every item players are allowed to sell, and the price (in Handfuls) shops pay/charge for it. Drag Items here — from the world, a compendium, or a whole compendium folder — to add them. Roll-table-stocked shops will automatically use these prices, and any item not listed here can't be sold back by players.",
+    "SHOPMARKET.Catalog.DropHere": "Drag an Item, a Folder of Items, or a whole compendium here",
     "SHOPMARKET.Catalog.Price": "Price (Luna)",
-    "SHOPMARKET.Catalog.Delete": "Delete Entry",
-    "SHOPMARKET.Catalog.Empty": "No catalog entries yet.",
-    "SHOPMARKET.Catalog.Open": "Open Price Catalog"
+    "SHOPMARKET.Catalog.Delete": "Remove from catalog",
+    "SHOPMARKET.Catalog.Empty": "No catalog entries yet. Drag items in to get started."
 }

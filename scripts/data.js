@@ -3,11 +3,11 @@ export const SOCKET = `module.${MODULE_ID}`;
 
 export const SETTINGS = {
     shops: 'shops',
+    catalog: 'catalog',
     returnSoldItems: 'returnSoldItems',
     sellEnabled: 'sellEnabled'
 };
 
-/** Item types this module treats as sellable/stockable inventory in the Daggerheart system. */
 export const INVENTORY_ITEM_TYPES = ['loot'];
 
 export function registerSettings() {
@@ -16,6 +16,13 @@ export function registerSettings() {
         config: false,
         type: Array,
         default: []
+    });
+
+    game.settings.register(MODULE_ID, SETTINGS.catalog, {
+        scope: 'world',
+        config: false,
+        type: Object,
+        default: {}
     });
 
     game.settings.register(MODULE_ID, SETTINGS.returnSoldItems, {
@@ -37,10 +44,6 @@ export function registerSettings() {
     });
 }
 
-/* -------------------------------------------- */
-/*  Shop CRUD (world setting persistence)        */
-/* -------------------------------------------- */
-
 export function getShops() {
     return foundry.utils.deepClone(game.settings.get(MODULE_ID, SETTINGS.shops));
 }
@@ -49,7 +52,6 @@ export function getShop(shopId) {
     return getShops().find(s => s.id === shopId) ?? null;
 }
 
-/** Only ever called on the GM (authoritative) client. */
 export async function saveShops(shops) {
     if (!game.user.isGM) throw new Error('Only the GM can write shop data.');
     await game.settings.set(MODULE_ID, SETTINGS.shops, shops);
@@ -84,18 +86,16 @@ export function makeEmptyShop() {
     };
 }
 
-/** Convert an actor's gold object into a single normalized "handfuls" value. */
 export function goldToHandfuls(gold) {
     return gold?.handfuls ?? 0;
 }
 
-/** Convert a normalized "handfuls" value back into the gold structure (handfuls only). */
 export function handfulsToGold(totalHandfuls) {
     return { handfuls: Math.max(0, Math.floor(totalHandfuls)) };
 }
 
 export function formatGold(gold) {
-    return `${gold.handfuls ?? 0} Lu`;
+    return `${gold.handfuls ?? 0} Luna`;
 }
 
 export function formatPrice(priceInHandfuls) {
@@ -107,10 +107,6 @@ function handfulsToGoldLabel(value) {
     return formatGold(gold);
 }
 
-/* -------------------------------------------- */
-/*  Actor helpers                                */
-/* -------------------------------------------- */
-
 export function getActorTotalHandfuls(actor) {
     return goldToHandfuls(actor.system.gold);
 }
@@ -120,19 +116,8 @@ export async function setActorTotalHandfuls(actor, totalHandfuls) {
     await actor.update({ 'system.gold': gold });
 }
 
-/**
- * Add a snapshot item to an actor's inventory, stacking onto an existing
- * item (matched by the shop catalog entry's stable key) if present.
- * This now stacks against any item whose resolved stackKey matches,
- * even if it came from another source (loot, compendium, etc.).
- */
-export async function addItemToActor(actor, catalogEntry, quantity = 1) {
-    const key = catalogEntry.stackKey;
-    // console.log(catalogEntry)
-
-    // Use resolved stack key so non-shop items with same source also stack
-    // const existing = actor.items.find(i => getItemStackKey(i) === key);
-    const existing = actor.items.find(i => i.name === catalogEntry.name && i.type === catalogEntry.type)
+export async function addItemToActor(actor, sourceEntry, quantity = 1) {
+    const existing = actor.items.find(i => i.name === sourceEntry.name && i.type === sourceEntry.type);
 
     if (existing) {
         const newQty = (existing.system.quantity ?? 1) + quantity;
@@ -140,10 +125,9 @@ export async function addItemToActor(actor, catalogEntry, quantity = 1) {
         return existing;
     }
 
-    const itemData = foundry.utils.deepClone(catalogEntry.itemData);
+    const itemData = foundry.utils.deepClone(sourceEntry.itemData);
     itemData.system = itemData.system ?? {};
     itemData.system.quantity = quantity;
-    foundry.utils.setProperty(itemData, `flags.${MODULE_ID}.stackKey`, key);
 
     const [created] = await actor.createEmbeddedDocuments('Item', [itemData]);
     return created;
@@ -160,23 +144,10 @@ export async function removeQuantityFromActorItem(actorItem, quantity = 1) {
     }
 }
 
-/** Build a stable stacking key for a source item (compendium/world item or a raw item document). */
 export function buildStackKey(item) {
     const source = item.uuid ?? item._id ?? item.name;
     return `src:${source}`;
 }
-
-/** Resolve the stacking key of an item already sitting in an actor's inventory. */
-export function getItemStackKey(item) {
-    return (
-        item.getFlag(MODULE_ID, 'stackKey') ??
-        (item.getFlag('core', 'sourceId') ? `src:${item.getFlag('core', 'sourceId')}` : `src:${item.name}`)
-    );
-}
-
-/* -------------------------------------------- */
-/*  Roll table driven inventory generation       */
-/* -------------------------------------------- */
 
 async function resultToSourceItem(result) {
     let doc = null;
@@ -189,7 +160,6 @@ async function resultToSourceItem(result) {
     return doc;
 }
 
-/** Draw `shop.rollCount` results across the shop's configured roll tables and return source Item documents. */
 export async function drawShopItems(shop) {
     if (!shop.rollTableUuids?.length) return [];
     const drawn = [];
@@ -206,11 +176,6 @@ export async function drawShopItems(shop) {
     return drawn;
 }
 
-/**
- * Regenerate a shop's inventory from its configured roll tables. Existing catalog
- * entries (and their GM-set prices) are preserved and topped up; brand-new items
- * are added with a price from the global catalog if present, otherwise 1 Handful.
- */
 export async function generateShopInventory(shop) {
     const drawnItems = await drawShopItems(shop);
     const inventory = foundry.utils.deepClone(shop.inventory ?? []);
@@ -222,8 +187,6 @@ export async function generateShopInventory(shop) {
         if (existing) {
             if (shop.allowDuplicates !== false && !existing.unlimited) existing.quantity += 1;
         } else {
-            const predefinedPrice = catalog[stackKey] ?? 1;
-
             inventory.push({
                 id: foundry.utils.randomID(),
                 stackKey,
@@ -232,7 +195,7 @@ export async function generateShopInventory(shop) {
                 type: sourceItem.type,
                 quantity: 1,
                 unlimited: false,
-                price: predefinedPrice,
+                price: catalog[stackKey]?.price ?? 1,
                 itemData: sourceItem.toObject()
             });
         }
@@ -242,7 +205,6 @@ export async function generateShopInventory(shop) {
     return shop;
 }
 
-/** Add a single item (dragged in directly by the GM) as a new catalog entry. */
 export function addDirectItemToShop(shop, sourceItem, quantity = 1, price = 1) {
     const stackKey = buildStackKey(sourceItem);
     const existing = shop.inventory.find(e => e.stackKey === stackKey);
@@ -264,4 +226,51 @@ export function addDirectItemToShop(shop, sourceItem, quantity = 1, price = 1) {
     return shop;
 }
 
+export function getCatalog() {
+    return foundry.utils.deepClone(game.settings.get(MODULE_ID, SETTINGS.catalog));
+}
 
+export function getCatalogEntries() {
+    return Object.values(getCatalog());
+}
+
+/** Only ever called on the GM (authoritative) client. */
+export async function saveCatalog(catalog) {
+    if (!game.user.isGM) throw new Error('Only the GM can write the catalog.');
+    await game.settings.set(MODULE_ID, SETTINGS.catalog, catalog);
+    return catalog;
+}
+
+/** Add (or update) a catalog entry from a source Item document (world or compendium). */
+export async function upsertCatalogEntry(sourceItem, price = 1) {
+    const catalog = getCatalog();
+    const stackKey = buildStackKey(sourceItem);
+    catalog[stackKey] = {
+        stackKey,
+        name: sourceItem.name,
+        img: sourceItem.img,
+        type: sourceItem.type,
+        price: catalog[stackKey]?.price ?? Math.max(0, price),
+        itemData: sourceItem.toObject()
+    };
+    await saveCatalog(catalog);
+    return catalog[stackKey];
+}
+
+export async function updateCatalogPrice(stackKey, price) {
+    const catalog = getCatalog();
+    if (!catalog[stackKey]) return null;
+    catalog[stackKey].price = Math.max(0, price);
+    await saveCatalog(catalog);
+    return catalog[stackKey];
+}
+
+export async function deleteCatalogEntry(stackKey) {
+    const catalog = getCatalog();
+    delete catalog[stackKey];
+    await saveCatalog(catalog);
+}
+
+export function findCatalogEntryForItem(item, catalog = getCatalog()) {
+    return Object.values(catalog).find(e => e.name === item.name && e.type === item.type) ?? null;
+}

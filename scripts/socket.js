@@ -1,4 +1,4 @@
-import { MODULE_ID, SOCKET, SETTINGS, getShops, saveShops } from './data.js';
+import { MODULE_ID, SOCKET, SETTINGS, getShops, saveShops, getCatalog } from './data.js';
 
 const pending = new Map();
 
@@ -7,10 +7,6 @@ export function initSocket() {
 }
 
 function isAuthoritativeGM() {
-    // Prefer the single "active GM" so two GM clients online at once don't
-    // double-process a transaction. If that can't be determined for some
-    // reason, fall back to letting any connected GM handle it rather than
-    // leaving every request to time out with no one responding.
     if (!game.user.isGM) return false;
     const active = game.users.activeGM;
     return active ? game.user.id === active.id : true;
@@ -50,11 +46,10 @@ async function handleMessage(msg) {
 function emitResponse(requestId, targetUserId, result) {
     const payload = { type: 'response', requestId, targetUserId, result };
     game.socket.emit(SOCKET, payload);
-    // The GM is also a client; if the GM itself is the buyer/seller, loop back locally.
+
     if (targetUserId === game.user.id) handleMessage(payload);
 }
 
-/** Send a request to the GM and await the structured result. Resolves locally if the caller is the GM. */
 function sendRequest(type, payload) {
     if (isAuthoritativeGM()) {
         const fn = type === 'requestBuy' ? performBuy : performSell;
@@ -89,10 +84,6 @@ export function requestSell(payload) {
     return sendRequest('requestSell', payload);
 }
 
-/* -------------------------------------------- */
-/*  GM-side authoritative transaction handlers   */
-/* -------------------------------------------- */
-
 async function performBuy({ shopId, entryId, quantity }) {
     const shops = getShops();
     const shop = shops.find(s => s.id === shopId);
@@ -110,7 +101,7 @@ async function performBuy({ shopId, entryId, quantity }) {
     return { ok: true, entry: foundry.utils.deepClone(entry), quantity, price: entry.price };
 }
 
-async function performSell({ shopId, stackKey, quantity }) {
+async function performSell({ shopId, itemName, itemType, quantity }) {
     if (!game.settings.get(MODULE_ID, SETTINGS.sellEnabled)) {
         return { ok: false, error: 'selling-disabled' };
     }
@@ -119,15 +110,17 @@ async function performSell({ shopId, stackKey, quantity }) {
     const shop = shops.find(s => s.id === shopId);
     if (!shop || !shop.enabled) return { ok: false, error: 'shop-unavailable' };
 
-    const entry = shop.inventory.find(e => e.stackKey === stackKey);
-    if (!entry || entry.price === null || entry.price === undefined) {
+    const catalog = getCatalog();
+    const catalogEntry = Object.values(catalog).find(e => e.name === itemName && e.type === itemType);
+    if (!catalogEntry || catalogEntry.price === null || catalogEntry.price === undefined) {
         return { ok: false, error: 'no-price' };
     }
 
-    if (game.settings.get(MODULE_ID, SETTINGS.returnSoldItems) && !entry.unlimited) {
-        entry.quantity += quantity;
+    if (game.settings.get(MODULE_ID, SETTINGS.returnSoldItems)) {
+        const stockEntry = shop.inventory.find(e => e.stackKey === catalogEntry.stackKey);
+        if (stockEntry && !stockEntry.unlimited) stockEntry.quantity += quantity;
     }
 
     await saveShops(shops);
-    return { ok: true, price: entry.price, quantity };
+    return { ok: true, price: catalogEntry.price, quantity };
 }

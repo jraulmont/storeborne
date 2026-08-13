@@ -1,6 +1,7 @@
 <div class="storeborne shop-config">
     <div class="toolbar">
         <button type="button" data-action="createShop"><i class="fa-solid fa-plus"></i> {{localize "SHOPMARKET.Config.NewShop"}}</button>
+        <button type="button" data-action="openCatalog"><i class="fa-solid fa-book"></i> {{localize "SHOPMARKET.Config.OpenCatalog"}}</button>
         <button type="button" data-action="openSettings"><i class="fa-solid fa-gear"></i> {{localize "SHOPMARKET.Config.Settings"}}</button>
     </div>
 
@@ -18,7 +19,7 @@
                     <i class="fa-solid {{#if shop.enabled}}fa-eye{{else}}fa-eye-slash{{/if}}"></i>
                 </button>
                 <button type="button" data-action="previewShop" title="{{localize 'SHOPMARKET.Config.Preview'}}">
-                    <i class="fa-solid fa-store"></i>
+                    <i class="fa-solid fa-coins"></i>
                 </button>
                 <button type="button" data-action="editShop" title="{{localize 'SHOPMARKET.Config.Edit'}}">
                     <i class="fa-solid fa-pen"></i>

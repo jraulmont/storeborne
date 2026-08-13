@@ -8,7 +8,7 @@ export class ShopBrowser extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
         id: 'storeborne-browser',
         tag: 'div',
-        window: { title: 'SHOPMARKET.Browser.Title', icon: 'fa-solid fa-store' },
+        window: { title: 'SHOPMARKET.Browser.Title', icon: 'fa-solid fa-coins' },
         position: { width: 420, height: 520 },
         actions: {
             openShop: ShopBrowser.#onOpenShop

@@ -3,6 +3,7 @@ import { initSocket } from './socket.js';
 import { ShopConfig } from './apps/shop-config.js';
 import { ShopBrowser } from './apps/shop-browser.js';
 import { ShopView } from './apps/shop-view.js';
+import { ShopCatalog } from './apps/shop-catalog.js';
 import { resolvePlayerActor, promptForActor } from './util.js';
 
 Hooks.once('init', () => {
@@ -19,6 +20,7 @@ Hooks.once('ready', async () => {
     const api = {
         openShopManager: () => new ShopConfig().render(true),
         openShopBrowser: () => new ShopBrowser().render(true),
+        openShopCatalog: () => new ShopCatalog().render(true),
         openShop: async (shopId, actor) => {
             actor ??= resolvePlayerActor() ?? (await promptForActor());
             if (!actor) return;
@@ -35,7 +37,7 @@ Hooks.on('getSceneControlButtons', controls => {
     const button = {
         name: 'storeborne-open',
         title: 'SHOPMARKET.Controls.Open',
-        icon: 'fa-solid fa-store',
+        icon: 'fa-solid fa-coins',
         button: true,
         onClick: () => {
             const api = game.modules.get(MODULE_ID).api;
@@ -58,9 +60,9 @@ async function ensureDefaultMacros(api) {
     if (existing) return;
 
     await Macro.create({
-        name: 'Open Shops',
+        name: 'shops',
         type: 'script',
-        img: 'icons/svg/chest.svg',
+        img: 'icons/commodities/currency/coins-plain-stack-silver.webp',
         command: "game.modules.get('storeborne').api.openShopBrowser();",
         ownership: { default: CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER },
         flags: { [MODULE_ID]: { default: true } }

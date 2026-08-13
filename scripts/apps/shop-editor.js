@@ -1,4 +1,13 @@
-import { MODULE_ID, getShop, upsertShop, generateShopInventory, addDirectItemToShop, formatPrice } from '../data.js';
+import {
+    MODULE_ID,
+    getShop,
+    upsertShop,
+    generateShopInventory,
+    addDirectItemToShop,
+    formatPrice,
+    getCatalog,
+    buildStackKey
+} from '../data.js';
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -11,7 +20,7 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
     static DEFAULT_OPTIONS = {
         id: 'storeborne-editor',
         tag: 'form',
-        window: { title: 'SHOPMARKET.Editor.Title', icon: 'fa-solid fa-store', resizable: true },
+        window: { title: 'SHOPMARKET.Editor.Title', icon: 'fa-solid fa-coins', resizable: true },
         position: { width: 700, height: 780 },
         form: { handler: ShopEditor.#onSubmit, submitOnChange: true, closeOnSubmit: false },
         actions: {
@@ -38,8 +47,9 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
             const table = await fromUuid(uuid);
             tables.push({ uuid, name: table?.name ?? '(missing table)' });
         }
+        const catalog = getCatalog();
         const inventory = (shop.inventory ?? [])
-            .map(e => ({ ...e, priceLabel: formatPrice(e.price ?? 0) }))
+            .map(e => ({ ...e, priceLabel: formatPrice(e.price ?? 0), inCatalog: !!catalog[e.stackKey] }))
             .sort((a, b) => a.name.localeCompare(b.name));
         return { shop, tables, inventory };
     }
@@ -93,7 +103,9 @@ export class ShopEditor extends HandlebarsApplicationMixin(ApplicationV2) {
         const item = await fromUuid(data.uuid);
         if (!item) return;
         const shop = this.shop;
-        addDirectItemToShop(shop, item, 1, 1);
+        const catalog = getCatalog();
+        const price = catalog[buildStackKey(item)]?.price ?? 1;
+        addDirectItemToShop(shop, item, 1, price);
         await upsertShop(shop);
         this.render();
     }
